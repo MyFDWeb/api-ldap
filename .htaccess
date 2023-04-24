@@ -1,0 +1,3 @@
+DirectoryIndex api.php
+RewriteEngine on
+RewriteRule ^(add|delete|modify|search|passwd|rename) api.php
