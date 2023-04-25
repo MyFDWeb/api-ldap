@@ -76,12 +76,13 @@ if (!ldap_bind($ldap, $auth[0], $auth[1]))
     error("Could not bind to the ldap server using the given credentials.");
 
 if (endsWith($_SERVER["REQUEST_URI"], "/whoami")) {
-    echo(json_encode(["result" => "success", "entry" => ldap_exop_whoami($ldap)]));
+    echo(json_encode(["result" => "success", "data" => ldap_exop_whoami($ldap)]));
 } else if (endsWith($_SERVER["REQUEST_URI"], "/add")) {
     if (!isset($body["dn"]) || !isset($body["entry"]))
         error("Missing parameter.");
     if (!ldap_add($ldap, $body["dn"], $body["entry"]))
         error(ldap_error($ldap));
+    echo(json_encode(["result" => "success"]));
 } else if (endsWith($_SERVER["REQUEST_URI"], "/delete")) {
     if (!isset($body["dn"]))
         error("Missing parameter.");
@@ -92,6 +93,7 @@ if (endsWith($_SERVER["REQUEST_URI"], "/whoami")) {
         error("Missing parameter.");
     if (!ldap_modify($ldap, $body["dn"], $body["entry"]))
         error(ldap_error($ldap));
+    echo(json_encode(["result" => "success"]));
 } else if (endsWith($_SERVER["REQUEST_URI"], "/search")) {
     if (!isset($body["base"]) || !isset($body["filter"]) || !isset($body["attributes"]))
         error("Missing parameter.");
@@ -100,15 +102,18 @@ if (endsWith($_SERVER["REQUEST_URI"], "/whoami")) {
     $result = ldap_search($ldap, $body["base"], $body["filter"], $body["attributes"]);
     if (!$result)
         error(ldap_error($ldap));
-    echo(json_encode(["result" => "success", "entry" => cleanUpEntry(ldap_get_entries($ldap, $result))]));
+    echo(json_encode(["result" => "success", "data" => cleanUpEntry(ldap_get_entries($ldap, $result))]));
 } else if (endsWith($_SERVER["REQUEST_URI"], "/passwd")) {
     if (!isset($body["user"]) || !isset($body["password"]))
         error("Missing parameter.");
     if (!ldap_exop_passwd($ldap, $body["user"], "", $body["password"]))
         error(ldap_error($ldap));
+    echo(json_encode(["result" => "success"]));
 } else if (endsWith($_SERVER["REQUEST_URI"], "/rename")) {
     if (!isset($body["dn"]) || !isset($body["new_dn"]) || !isset($body["new_parent"]))
         error("Missing parameter.");
     if (!ldap_rename($ldap, $body["dn"], $body["new_dn"], $body["new_parent"], true))
         error(ldap_error($ldap));
-}
+    echo(json_encode(["result" => "success"]));
+} else
+    error("Unknown action");
