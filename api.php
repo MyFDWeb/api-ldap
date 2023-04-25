@@ -11,7 +11,7 @@ if ($body == null)
     $body = [];
 ini_set("display_errors", "off");
 
-if (in_array(parse_url($_SERVER['HTTP_REFERER'])["host"], explode(",", getenv("ALLOW_ORIGINS")))) {
+if (getenv("ALLOW_ORIGINS") && in_array(parse_url($_SERVER['HTTP_REFERER'])["host"], explode(",", getenv("ALLOW_ORIGINS")))) {
     header("Access-Control-Allow-Origin: https://" . parse_url($_SERVER['HTTP_REFERER'])["host"]);
     header("Access-Control-Allow-Methods: POST");
 }
