@@ -1,6 +1,6 @@
 <?php
 
-if ($_SERVER["REQUEST_URI"] == "/" || $_SERVER["REQUEST_METHOD"] != "POST") {
+if ($_SERVER["REQUEST_URI"] == "/" || $_SERVER["REQUEST_METHOD"] == "GET") {
     header("Location: https://api.myfdweb.de/ldap");
     exit;
 }
@@ -14,6 +14,7 @@ ini_set("display_errors", "off");
 if (getenv("ALLOW_ORIGINS") && in_array(parse_url($_SERVER['HTTP_REFERER'])["host"], explode(",", getenv("ALLOW_ORIGINS")))) {
     header("Access-Control-Allow-Origin: https://" . parse_url($_SERVER['HTTP_REFERER'])["host"]);
     header("Access-Control-Allow-Methods: POST");
+    header("Access-Control-Allow-Headers: Authorization,Content-Type,X-LDAP-URI");
 }
 header("Content-Type: application/json");
 
