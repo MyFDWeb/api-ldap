@@ -27,6 +27,15 @@ function error(string $msg): void
     exit;
 }
 
+function endsWith($haystack, $needle): bool
+{
+    $length = strlen($needle);
+    if (!$length) {
+        return true;
+    }
+    return substr($haystack, -$length) === $needle;
+}
+
 function cleanUpEntry($entry): array
 {
     $retEntry = array();
@@ -66,24 +75,24 @@ $auth = explode(":", base64_decode(explode(" ", $headers["authorization"])[1]));
 if (!ldap_bind($ldap, $auth[0], $auth[1]))
     error("Could not bind to the ldap server using the given credentials.");
 
-if ($_SERVER["REQUEST_URI"] == "/whoami") {
+if (endsWith($_SERVER["REQUEST_URI"], "/whoami")) {
     echo(ldap_exop_whoami($ldap));
-} else if ($_SERVER["REQUEST_URI"] == "/add") {
+} else if (endsWith($_SERVER["REQUEST_URI"], "/add")) {
     if (!isset($body["dn"]) || !isset($body["entry"]))
         error("Missing parameter.");
     if (!ldap_add($ldap, $body["dn"], $body["entry"]))
         error(ldap_error($ldap));
-} else if ($_SERVER["REQUEST_URI"] == "/delete") {
+} else if (endsWith($_SERVER["REQUEST_URI"], "/delete")) {
     if (!isset($body["dn"]))
         error("Missing parameter.");
     if (!ldap_delete($ldap, $body["dn"]))
         error(ldap_error($ldap));
-} else if ($_SERVER["REQUEST_URI"] == "/modify") {
+} else if (endsWith($_SERVER["REQUEST_URI"], "/modify")) {
     if (!isset($body["dn"]) || !isset($body["entry"]))
         error("Missing parameter.");
     if (!ldap_modify($ldap, $body["dn"], $body["entry"]))
         error(ldap_error($ldap));
-} else if ($_SERVER["REQUEST_URI"] == "/search") {
+} else if (endsWith($_SERVER["REQUEST_URI"], "/search")) {
     if (!isset($body["base"]) || !isset($body["filter"]) || !isset($body["attributes"]))
         error("Missing parameter.");
     if (!is_array($body["attributes"]))
@@ -92,12 +101,12 @@ if ($_SERVER["REQUEST_URI"] == "/whoami") {
     if (!$result)
         error(ldap_error($ldap));
     echo(json_encode(["result" => "success", "entry" => cleanUpEntry(ldap_get_entries($ldap, $result))]));
-} else if ($_SERVER["REQUEST_URI"] == "/passwd") {
+} else if (endsWith($_SERVER["REQUEST_URI"], "/passwd")) {
     if (!isset($body["user"]) || !isset($body["password"]))
         error("Missing parameter.");
     if (!ldap_exop_passwd($ldap, $body["user"], "", $body["password"]))
         error(ldap_error($ldap));
-} else if ($_SERVER["REQUEST_URI"] == "/rename") {
+} else if (endsWith($_SERVER["REQUEST_URI"], "/rename")) {
     if (!isset($body["dn"]) || !isset($body["new_dn"]) || !isset($body["new_parent"]))
         error("Missing parameter.");
     if (!ldap_rename($ldap, $body["dn"], $body["new_dn"], $body["new_parent"], true))
