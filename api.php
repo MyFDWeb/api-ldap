@@ -67,7 +67,7 @@ if (!ldap_bind($ldap, $auth[0], $auth[1]))
     error("Could not bind to the ldap server using the given credentials.");
 
 if ($_SERVER["REQUEST_URI"] == "/whoami") {
-    echo(ldap_exop_whoami());
+    echo(ldap_exop_whoami($ldap));
 } else if ($_SERVER["REQUEST_URI"] == "/add") {
     if (!isset($body["dn"]) || !isset($body["entry"]))
         error("Missing parameter.");
