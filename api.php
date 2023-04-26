@@ -95,11 +95,19 @@ if (endsWith($_SERVER["REQUEST_URI"], "/whoami")) {
         error(ldap_error($ldap));
     echo(json_encode(["result" => "success"]));
 } else if (endsWith($_SERVER["REQUEST_URI"], "/search")) {
-    if (!isset($body["base"]) || !isset($body["filter"]) || !isset($body["attributes"]))
+    if (!isset($body["base"]) || !isset($body["scope"]) || !isset($body["filter"]) || !isset($body["attributes"]))
         error("Missing parameter.");
     if (!is_array($body["attributes"]))
         error("Parameter attributes must be of type array.");
-    $result = ldap_search($ldap, $body["base"], $body["filter"], $body["attributes"]);
+    $scope = strtolower($body["scope"]);
+    if($scope == "base")
+        $result = ldap_read($ldap, $body["base"], $body["filter"], $body["attributes"]);
+    else if($scope == "one")
+        $result = ldap_list($ldap, $body["base"], $body["filter"], $body["attributes"]);
+    else if($scope == "subtree")
+        $result = ldap_search($ldap, $body["base"], $body["filter"], $body["attributes"]);
+    else
+        error("Invalid scope.");
     if (!$result)
         error(ldap_error($ldap));
     echo(json_encode(["result" => "success", "data" => cleanUpEntry(ldap_get_entries($ldap, $result))]));

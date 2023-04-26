@@ -35,6 +35,7 @@ Parameters:
 Url: `https://ldap.api.myfdweb.de/search`  
 Parameters:
 * `base` The ldap query base
+* `scope` The search scope. Can either be base, one or subtree.
 * `filter` The ldap query filter
 * `attributes` A list of attributes to be returned. If empty all attributes will be returned
 
